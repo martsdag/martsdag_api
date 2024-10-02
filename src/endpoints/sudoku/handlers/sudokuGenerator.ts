@@ -1,50 +1,27 @@
-import { Sudoku } from 'sudoku-gen/dist/types/sudoku.type';
+import { pick } from '@/utils/pick';
+import { getSudoku } from 'sudoku-gen';
 
-enum Difficulty {
-  Easy = 'easy',
-  Medium = 'medium',
-  Hard = 'hard',
-  Expert = 'expert',
-}
+const DIFFICULTIES = Object.freeze({ EASY: 'easy', MEDIUM: 'medium', HARD: 'hard', EXPERT: 'expert' });
+const FORMATS = Object.freeze({ STRING: 'string', MATRIX: 'matrix' });
 
-class SudokuGenerator {
-  private difficulty: Difficulty;
+export class SudokuGenerator {
+  private sudoku: {
+    puzzle: string;
+    solution: string;
+  };
 
-  constructor(difficulty: Difficulty = Difficulty.Easy) {
-    this.difficulty = difficulty;
+  constructor(difficulty: (typeof DIFFICULTIES)[keyof typeof DIFFICULTIES]) {
+    this.sudoku = pick(getSudoku(difficulty), ['puzzle', 'solution']);
   }
 
-  public setDifficulty(difficulty: Difficulty) {
-    this.difficulty = difficulty;
-  }
+  getResult(format: (typeof FORMATS)[keyof typeof FORMATS]) {
+    if (format === FORMATS.MATRIX) {
+      return {
+        puzzle: this.sudoku.puzzle.match(/.{9}/g)!.map((row) => row.split('')),
+        solution: this.sudoku.solution.match(/.{9}/g)!.map((row) => row.split('')),
+      };
+    }
 
-  public generatePuzzle(): Sudoku {
-    const sudoku: Sudoku = {
-      puzzle: '',
-      solution: '',
-      difficulty: this.difficulty,
-    };
-
-    const generated = this.generateSudokuByDifficulty();
-
-    sudoku.puzzle = generated.puzzle;
-    sudoku.solution = generated.solution;
-
-    return sudoku;
-  }
-
-  private generateSudokuByDifficulty(): { puzzle: string; solution: string } {
-    const puzzle = '';
-    const solution = '';
-
-    return { puzzle, solution };
+    return this.sudoku;
   }
 }
-
-export { SudokuGenerator, Difficulty };
-
-const sudokuGenerator = new SudokuGenerator();
-
-sudokuGenerator.generatePuzzle();
-
-export default sudokuGenerator;

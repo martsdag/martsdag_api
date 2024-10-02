@@ -1,15 +1,13 @@
 import { Router } from 'express';
-import sudokuGenerator, { Difficulty } from '@/endpoints/sudoku/handlers/sudokuGenerator';
+import { SudokuGenerator } from '@/endpoints/sudoku/handlers/sudokuGenerator';
 
 const router = Router();
 
 router.get('/', (req, res) => {
-  const difficulty = (req.query.difficulty as string) || 'easy';
+  const difficulty = (req.query.difficulty as 'easy' | 'medium' | 'hard' | 'expert') || 'easy';
+  const format = (req.query.format as 'string' | 'matrix') || 'string';
 
-  sudokuGenerator.setDifficulty(difficulty as Difficulty);
-
-  const puzzle = sudokuGenerator.generatePuzzle();
-
-  res.send(puzzle);
+  res.send(new SudokuGenerator(difficulty).getResult(format));
 });
+
 export { router as sudoku };
