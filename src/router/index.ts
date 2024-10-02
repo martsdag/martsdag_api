@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import sudoku from './sudoku';
+import { sudoku } from '@/endpoints/sudoku';
 
 const router = Router();
 
