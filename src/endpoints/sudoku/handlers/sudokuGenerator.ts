@@ -17,11 +17,14 @@ export class SudokuGenerator {
   getResult(format: (typeof FORMATS)[keyof typeof FORMATS]) {
     if (format === FORMATS.MATRIX) {
       return {
-        puzzle: this.sudoku.puzzle.match(/.{9}/g)!.map((row) => row.split('')),
-        solution: this.sudoku.solution.match(/.{9}/g)!.map((row) => row.split('')),
+        puzzle: this.ResultStringToMatrix(this.sudoku.puzzle),
+        solution: this.ResultStringToMatrix(this.sudoku.solution),
       };
     }
 
     return this.sudoku;
+  }
+  ResultStringToMatrix(ResultString: string) {
+    return (ResultString.match(/.{9}/g) ?? []).map((row) => row.split(''));
   }
 }
