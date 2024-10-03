@@ -3,8 +3,8 @@ import { SudokuGenerator } from '@/endpoints/sudoku/handlers/sudokuGenerator';
 
 const router = Router();
 
-//TODO: исправить 8 и 9 строчки
 router.get('/', (req, res) => {
+  // TODO: исправить
   const difficulty = (req.query.difficulty as 'easy' | 'medium' | 'hard' | 'expert') || 'easy';
   const format = (req.query.format as 'string' | 'matrix') || 'string';
 

@@ -15,16 +15,17 @@ export class SudokuGenerator {
   }
 
   getResult(format: (typeof FORMATS)[keyof typeof FORMATS]) {
+    const ResultStringToMatrix = (ResultString: string) => {
+      return (ResultString.match(/.{9}/g) ?? []).map((row) => row.split(''));
+    };
+
     if (format === FORMATS.MATRIX) {
       return {
-        puzzle: this.ResultStringToMatrix(this.sudoku.puzzle),
-        solution: this.ResultStringToMatrix(this.sudoku.solution),
+        puzzle: ResultStringToMatrix(this.sudoku.puzzle),
+        solution: ResultStringToMatrix(this.sudoku.solution),
       };
     }
 
     return this.sudoku;
-  }
-  ResultStringToMatrix(ResultString: string) {
-    return (ResultString.match(/.{9}/g) ?? []).map((row) => row.split(''));
   }
 }
