@@ -15,14 +15,12 @@ export class SudokuGenerator {
   }
 
   getResult(format: (typeof FORMATS)[keyof typeof FORMATS]) {
-    const ResultStringToMatrix = (ResultString: string) => {
-      return (ResultString.match(/.{9}/g) ?? []).map((row) => row.split(''));
-    };
-
     if (format === FORMATS.MATRIX) {
+      const stringToMatrix = (string: string) => (string.match(/.{9}/g) ?? []).map((rowOrCol) => rowOrCol.split(''));
+
       return {
-        puzzle: ResultStringToMatrix(this.sudoku.puzzle),
-        solution: ResultStringToMatrix(this.sudoku.solution),
+        puzzle: stringToMatrix(this.sudoku.puzzle),
+        solution: stringToMatrix(this.sudoku.solution),
       };
     }
 
