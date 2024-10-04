@@ -1,13 +1,13 @@
 import 'dotenv/config';
 import express from 'express';
+import { router } from './router';
 
 const app = express();
 const port = process.env.PORT;
 const domainName = process.env.DOMAIN_NAME;
 
-app.get('/', (req, res) => {
-  res.send('Sudoku!!!');
-});
+app.use(express.json());
+app.use(router);
 
 app.listen(port, () => {
   console.log(`http://${domainName}:${port}`);
