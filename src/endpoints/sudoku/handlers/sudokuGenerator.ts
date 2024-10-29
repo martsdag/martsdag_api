@@ -14,11 +14,8 @@ export class SudokuGenerator {
     this.sudoku = pick(getSudoku(difficulty), ['puzzle', 'solution']);
   }
 
-  getResult(format: (typeof FORMATS)[keyof typeof FORMATS], emptySymbol: string = '') {
-    const stringToMatrix = (string: string) =>
-      (string.match(/.{9}/g) ?? []).map((rowOrCol) =>
-        rowOrCol.split('').map((rowOrCol) => (rowOrCol === '-' ? emptySymbol : rowOrCol)),
-      );
+  getResult(format: (typeof FORMATS)[keyof typeof FORMATS]) {
+    const stringToMatrix = (string: string) => (string.match(/.{9}/g) ?? []).map((rowOrCol) => rowOrCol.split(''));
 
     if (format === FORMATS.MATRIX) {
       return {
