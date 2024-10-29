@@ -14,10 +14,13 @@ export class SudokuGenerator {
     this.sudoku = pick(getSudoku(difficulty), ['puzzle', 'solution']);
   }
 
-  getResult(format: (typeof FORMATS)[keyof typeof FORMATS]) {
-    if (format === FORMATS.MATRIX) {
-      const stringToMatrix = (string: string) => (string.match(/.{9}/g) ?? []).map((rowOrCol) => rowOrCol.split(''));
+  getResult(format: (typeof FORMATS)[keyof typeof FORMATS], emptySymbol: string = '') {
+    const stringToMatrix = (string: string) =>
+      (string.match(/.{9}/g) ?? []).map((rowOrCol) =>
+        rowOrCol.split('').map((rowOrCol) => (rowOrCol === '-' ? emptySymbol : rowOrCol)),
+      );
 
+    if (format === FORMATS.MATRIX) {
       return {
         puzzle: stringToMatrix(this.sudoku.puzzle),
         solution: stringToMatrix(this.sudoku.solution),
