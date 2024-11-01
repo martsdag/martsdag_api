@@ -4,7 +4,7 @@ import { getSudoku } from 'sudoku-gen';
 const DIFFICULTIES = Object.freeze({ EASY: 'easy', MEDIUM: 'medium', HARD: 'hard', EXPERT: 'expert' });
 const FORMATS = Object.freeze({ STRING: 'string', MATRIX: 'matrix' });
 
-export class SudokuGenerator {
+export class SudokuHandler {
   private sudoku: {
     puzzle: string;
     solution: string;
