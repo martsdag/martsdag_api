@@ -32,6 +32,7 @@ export class SudokuHandler {
 
     return this.sudoku;
   }
+
   static validate(puzzle: string): ValidationResult {
     const errors: Array<Array<'+' | '-'>> = [];
     let isOK = true;
