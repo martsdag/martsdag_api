@@ -38,7 +38,6 @@ export class SudokuHandler {
     let isOK = true;
     let isWin = true;
 
-    //проверка в строке
     for (let i = 0; i < 9; i++) {
       const rowErrors: Array<'+' | '-'> = [];
       const noticedInRow = new Set();
@@ -62,7 +61,6 @@ export class SudokuHandler {
       errors.push(rowErrors);
     }
 
-    // проверка в колонке
     for (let j = 0; j < 9; j++) {
       const colErrors: Array<'+' | '-'> = [];
       const noticedInCol = new Set();
@@ -86,7 +84,6 @@ export class SudokuHandler {
       errors.push(colErrors);
     }
 
-    //проверка в клетке 3 на 3
     for (let boxRow = 0; boxRow < 3; boxRow++) {
       for (let boxCol = 0; boxCol < 3; boxCol++) {
         const boxErrors: Array<'+' | '-'> = [];
