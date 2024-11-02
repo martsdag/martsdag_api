@@ -11,4 +11,14 @@ router.get('/', (req, res) => {
   res.send(new SudokuHandler(difficulty).getResult(format));
 });
 
+router.get('/validation', (req, res) => {
+  const puzzle = req.query.puzzle;
+
+  if (typeof puzzle !== 'string') {
+    return res.sendStatus(404);
+  }
+
+  res.send(SudokuHandler.validate(puzzle));
+});
+
 export { router as sudoku };
