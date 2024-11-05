@@ -12,9 +12,9 @@ router.get('/', (req, res) => {
 });
 
 router.get('/validation', (req, res) => {
-  const puzzle = req.query.puzzle;
+  const puzzle = req.query.puzzle as 'string' | 'matrix';
 
-  if (typeof puzzle !== 'string') {
+  if (typeof puzzle !== 'string' && !Array.isArray(puzzle)) {
     return res.sendStatus(404);
   }
 
