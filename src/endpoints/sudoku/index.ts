@@ -8,6 +8,10 @@ router.get('/', (req, res) => {
   const difficulty = (req.query.difficulty as 'easy' | 'medium' | 'hard' | 'expert') || 'easy';
   const format = (req.query.format as 'string' | 'matrix') || 'string';
 
+  if (SudokuGenerator.isValidDifficulty(difficulty)) {
+    return res.status(400).json({ error: 'Invalid type of difficulty' });
+  }
+
   res.send(new SudokuGenerator(difficulty).getResult(format));
 });
 
