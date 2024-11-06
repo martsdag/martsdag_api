@@ -1,10 +1,7 @@
 import { getSudoku } from 'sudoku-gen';
 
-const DIFFICULTIES = Object.freeze({ EASY: 'easy', MEDIUM: 'medium', HARD: 'hard', EXPERT: 'expert' });
-const FORMATS = Object.freeze({ STRING: 'string', MATRIX: 'matrix' });
-
-type Difficulty = (typeof DIFFICULTIES)[keyof typeof DIFFICULTIES];
-type Format = (typeof FORMATS)[keyof typeof FORMATS];
+export type Difficulty = (typeof SudokuGenerator.DIFFICULTIES)[keyof typeof SudokuGenerator.DIFFICULTIES];
+export type Format = (typeof SudokuGenerator.FORMATS)[keyof typeof SudokuGenerator.FORMATS];
 
 export class SudokuGenerator {
   private sudoku: {
@@ -13,16 +10,23 @@ export class SudokuGenerator {
     difficulty: Difficulty;
   };
 
+  static readonly DIFFICULTIES = Object.freeze({ EASY: 'easy', MEDIUM: 'medium', HARD: 'hard', EXPERT: 'expert' });
+  static readonly FORMATS = Object.freeze({ STRING: 'string', MATRIX: 'matrix' });
+
   constructor(difficulty: Difficulty) {
     this.sudoku = getSudoku(difficulty);
   }
 
   static isValidDifficulty(argument: unknown): argument is Difficulty {
-    return argument === 'string' && Object.values(DIFFICULTIES).includes(argument as Difficulty);
+    return typeof argument === 'string' && Object.values<string>(SudokuGenerator.DIFFICULTIES).includes(argument);
+  }
+
+  static isValidFormat(argument: unknown): argument is Format {
+    return typeof argument === 'string' && Object.values<string>(SudokuGenerator.FORMATS).includes(argument);
   }
 
   getResult(format: Format) {
-    if (format === FORMATS.MATRIX) {
+    if (format === SudokuGenerator.FORMATS.MATRIX) {
       const stringToMatrix = (string: string) => (string.match(/.{9}/g) ?? []).map((rowOrCol) => rowOrCol.split(''));
 
       return {

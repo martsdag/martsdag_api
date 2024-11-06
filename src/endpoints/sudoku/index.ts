@@ -1,18 +1,35 @@
 import { Router } from 'express';
-import { SudokuGenerator } from '@/endpoints/sudoku/handlers/sudokuGenerator';
+import { Difficulty, Format, SudokuGenerator } from '@/endpoints/sudoku/handlers/sudokuGenerator';
 
 const router = Router();
 
 router.get('/', (req, res) => {
-  // TODO: исправить
-  const difficulty = (req.query.difficulty as 'easy' | 'medium' | 'hard' | 'expert') || 'easy';
-  const format = (req.query.format as 'string' | 'matrix') || 'string';
+  const maybeDifficulty = req.query.difficulty;
+  const maybeFormat = req.query.format;
 
-  if (SudokuGenerator.isValidDifficulty(difficulty)) {
-    return res.status(400).json({ error: 'Invalid type of difficulty' });
+  const isValidDifficultyQuery = (argument: unknown): argument is undefined | Difficulty =>
+    argument === undefined || SudokuGenerator.isValidDifficulty(argument);
+
+  const isValidFormatQuery = (argument: unknown): argument is undefined | Format =>
+    argument === undefined || SudokuGenerator.isValidFormat(argument);
+
+  if (!isValidDifficultyQuery(maybeDifficulty)) {
+    res.status(400).json({ error: 'Invalid type of difficulty' });
+
+    return;
   }
 
-  res.send(new SudokuGenerator(difficulty).getResult(format));
+  if (!isValidFormatQuery(maybeFormat)) {
+    res.status(400).json({ error: 'Invalid type of format' });
+
+    return;
+  }
+
+  res.send(
+    new SudokuGenerator(maybeDifficulty ?? SudokuGenerator.DIFFICULTIES.EASY).getResult(
+      maybeFormat ?? SudokuGenerator.FORMATS.STRING,
+    ),
+  );
 });
 
 export { router as sudoku };
