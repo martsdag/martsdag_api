@@ -19,7 +19,7 @@ describe('/sudoku', () => {
         expect(res.body).toHaveProperty('solution');
       }));
 
-  test('If you enter the "string" format, you get the same format and have 81 symbols', async () => {
+  test('If you enter the "string" format, you get the same format and they have 81 symbols', async () => {
     const format = 'string';
 
     return request(app)
@@ -46,14 +46,6 @@ describe('/sudoku', () => {
       });
   });
 
-  test('default difficulty = easy', () => {
-    request(app)
-      .get('/sudoku')
-      .then((res) => {
-        expect(res.body.difficulty).toBe('easy');
-      });
-  });
-
   test('If you enter the type of difficulty, you get the same type of difficulty', async () => {
     const difficulty = 'expert';
 
@@ -65,8 +57,8 @@ describe('/sudoku', () => {
       });
   });
 
-  test('If i enter the wrong type of difficulty, you get an error message', async () => {
-    const difficulty = 'extraHard';
+  test('If you enter the wrong type of difficulty, you get an error message', async () => {
+    const difficulty = 'invalid type of difficulty';
 
     return request(app)
       .get('/sudoku')
@@ -76,4 +68,26 @@ describe('/sudoku', () => {
         expect(res.body.error).toBe('Invalid type of difficulty');
       });
   });
+
+  test('if you enter the wrong type of format, you get an error message ', async () => {
+    const format = 'invalid type of format';
+
+    return request(app)
+      .get('/sudoku')
+      .query({ format })
+      .then((res) => {
+        expect(res.statusCode).toBe(400);
+        expect(res.body.error).toBe('Invalid type of format');
+      });
+  });
+
+  test('It should return default values when no query parameters are provided', () =>
+    request(app)
+      .get('/sudoku')
+      .then((res) => {
+        expect(res.statusCode).toBe(200);
+        expect(res.body.difficulty).toBe('easy');
+        expect(typeof res.body.puzzle).toBe('string');
+        expect(typeof res.body.solution).toBe('string');
+      }));
 });
