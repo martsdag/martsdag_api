@@ -32,4 +32,19 @@ router.get('/', (req, res) => {
   );
 });
 
+router.get('/validate', (req, res) => {
+  const maybePuzzle = req.query.puzzle;
+
+  const isValidPuzzleQuery = (argument: unknown): argument is string =>
+    argument === undefined || SudokuGenerator.isValidPuzzle(argument);
+
+  if (!isValidPuzzleQuery(maybePuzzle)) {
+    res.status(400).json({ error: 'Invalid puzzle format' });
+
+    return;
+  }
+
+  res.send(SudokuGenerator.validate(maybePuzzle));
+});
+
 export { router as sudoku };
