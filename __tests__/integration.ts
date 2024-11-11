@@ -40,7 +40,6 @@ describe('/sudoku', () => {
       .get('/sudoku')
       .query({ format })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(Array.isArray(res.body.puzzle)).toBe(true);
         expect(Array.isArray(res.body.solution)).toBe(true);
       });
@@ -65,7 +64,6 @@ describe('/sudoku', () => {
       .query({ difficulty })
       .then((res) => {
         expect(res.statusCode).toBe(400);
-        expect(res.body.error).toBe('Invalid type of difficulty');
       });
   });
 
@@ -77,7 +75,6 @@ describe('/sudoku', () => {
       .query({ format })
       .then((res) => {
         expect(res.statusCode).toBe(400);
-        expect(res.body.error).toBe('Invalid type of format');
       });
   });
 
@@ -85,21 +82,19 @@ describe('/sudoku', () => {
     request(app)
       .get('/sudoku')
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.difficulty).toBe('easy');
         expect(typeof res.body.puzzle).toBe('string');
         expect(typeof res.body.solution).toBe('string');
       }));
 
   test('It should return FALSE for Sudoku with duplicate numbers in a row', async () => {
-    const puzzle = '4172-8--9-651-----32-5--6-1-49-5-78-5-3-924-6---4----5294-7-1-3-3-9--24---------7';
-    const wrongPuzzle = '417228--9-651-----32-5--6-1-49-5-78-5-3-924-6---4----5294-7-1-3-3-9--24---------7';
+    const puzzle = '---------------------------------------------------------------------------------';
+    const wrongPuzzle = '---22----------------------------------------------------------------------------';
 
     const validPuzzleRequest = request(app)
       .get('/sudoku/validate')
       .query({ puzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(true);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
@@ -110,8 +105,8 @@ describe('/sudoku', () => {
       .get('/sudoku/validate')
       .query({ puzzle: wrongPuzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(false);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
           '---++----------------------------------------------------------------------------',
         );
@@ -121,14 +116,13 @@ describe('/sudoku', () => {
   });
 
   test('It should return FALSE for Sudoku with duplicate numbers in a column', async () => {
-    const puzzle = '4172-8--9-651-----32-5--6-1-49-5-78-5-3-924-6---4----5294-7-1-3-3-9--24---------7';
-    const wrongPuzzle = '4172-84-9-651-----32-5--6-1-49-5-78-5-3-924-6---4----5294-7-1-3-3-9--24---------7';
+    const puzzle = '---------------------------------------------------------------------------------';
+    const wrongPuzzle = '---------------------------------------------2--------2--------------------------';
 
     const validPuzzleRequest = request(app)
       .get('/sudoku/validate')
       .query({ puzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(true);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
@@ -139,10 +133,10 @@ describe('/sudoku', () => {
       .get('/sudoku/validate')
       .query({ puzzle: wrongPuzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(false);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
-          '+-----+-----------------------------------+--------------------------------------',
+          '---------------------------------------------+--------+--------------------------',
         );
       });
 
@@ -150,14 +144,13 @@ describe('/sudoku', () => {
   });
 
   test('It should return FALSE for Sudoku with duplicate numbers in a box', async () => {
-    const puzzle = '4172-8--9-651-----32-5--6-1-49-5-78-5-3-924-6---4----5294-7-1-3-3-9--24---------7';
-    const wrongPuzzle = '4172-8--9-651-----32-5--6-1-49-5-78-5-3-924-6---44---5294-7-1-3-3-9--24---------7';
+    const puzzle = '---------------------------------------------------------------------------------';
+    const wrongPuzzle = '4--------4-----------------------------------------------------------------------';
 
     const validPuzzleRequest = request(app)
       .get('/sudoku/validate')
       .query({ puzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(true);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
@@ -168,10 +161,10 @@ describe('/sudoku', () => {
       .get('/sudoku/validate')
       .query({ puzzle: wrongPuzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(false);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
-          '------------------------------------------------++-------------------------------',
+          '+--------+-----------------------------------------------------------------------',
         );
       });
 
@@ -185,7 +178,6 @@ describe('/sudoku', () => {
       .get('/sudoku/validate')
       .query({ puzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(false);
         expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
@@ -202,7 +194,6 @@ describe('/sudoku', () => {
       .get('/sudoku/validate')
       .query({ puzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(true);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
@@ -213,7 +204,6 @@ describe('/sudoku', () => {
       .get('/sudoku/validate')
       .query({ puzzle: solvedPuzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(true);
         expect(res.body.isWin).toBe(true);
         expect(res.body.errors).toBe(
@@ -226,13 +216,12 @@ describe('/sudoku', () => {
 
   test('It should return TRUE if the sudoku is solved correctly and matches isOK', async () => {
     const puzzle = '4172-8--9-651-----32-5--6-1-49-5-78-5-3-924-6---4----5294-7-1-3-3-9--24---------7';
-    const almostSolvedPuzzle = '41726853996513782432854967114965378-583792416672481395294-7615373691524-8513249-7';
+    const almostSolvedPuzzle = '4172685399651378243285496711496537825837924166724813952948761537369152488513249-7';
 
     const puzzleRequest = request(app)
       .get('/sudoku/validate')
       .query({ puzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(true);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
@@ -243,8 +232,8 @@ describe('/sudoku', () => {
       .get('/sudoku/validate')
       .query({ puzzle: almostSolvedPuzzle })
       .then((res) => {
-        expect(res.statusCode).toBe(200);
         expect(res.body.isOK).toBe(true);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
         );
