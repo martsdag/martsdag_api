@@ -96,6 +96,7 @@ describe('/sudoku', () => {
       .query({ puzzle })
       .then((res) => {
         expect(res.body.isOK).toBe(true);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
         );
@@ -124,6 +125,7 @@ describe('/sudoku', () => {
       .query({ puzzle })
       .then((res) => {
         expect(res.body.isOK).toBe(true);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
         );
@@ -152,6 +154,7 @@ describe('/sudoku', () => {
       .query({ puzzle })
       .then((res) => {
         expect(res.body.isOK).toBe(true);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
         );
@@ -195,6 +198,7 @@ describe('/sudoku', () => {
       .query({ puzzle })
       .then((res) => {
         expect(res.body.isOK).toBe(true);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
         );
@@ -223,6 +227,7 @@ describe('/sudoku', () => {
       .query({ puzzle })
       .then((res) => {
         expect(res.body.isOK).toBe(true);
+        expect(res.body.isWin).toBe(false);
         expect(res.body.errors).toBe(
           '---------------------------------------------------------------------------------',
         );
