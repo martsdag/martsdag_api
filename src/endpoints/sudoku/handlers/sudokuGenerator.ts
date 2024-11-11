@@ -51,7 +51,6 @@ export class SudokuGenerator {
 
   static validate(puzzle: string): ValidationResult {
     let isOK = true;
-    let isWin = true;
     const errorsArray = Array(81).fill(false);
 
     const rows: Array<string[]> = Array.from({ length: 9 }, () => []);
@@ -64,7 +63,6 @@ export class SudokuGenerator {
         const cell = puzzle[index];
 
         if (cell === '-') {
-          isWin = false;
           continue;
         }
 
@@ -117,7 +115,7 @@ export class SudokuGenerator {
     return {
       errors,
       isOK,
-      isWin: isWin && isOK,
+      isWin: isOK && !puzzle.includes('-'),
     };
   }
 }
