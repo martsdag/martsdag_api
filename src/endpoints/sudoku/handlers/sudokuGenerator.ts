@@ -8,6 +8,7 @@ interface ValidationResult {
   isWin: boolean;
   errors: string;
 }
+//TODO: передавать ошибки в виде массива
 
 export class SudokuGenerator {
   private sudoku: {
@@ -31,10 +32,6 @@ export class SudokuGenerator {
     return typeof argument === 'string' && Object.values<string>(SudokuGenerator.FORMATS).includes(argument);
   }
 
-  static isValidPuzzle(argument: unknown): argument is string {
-    return typeof argument === 'string' && /^[1-9-]{1,81}$/.test(argument);
-  }
-
   getResult(format: Format) {
     if (format === SudokuGenerator.FORMATS.MATRIX) {
       const stringToMatrix = (string: string) => (string.match(/.{9}/g) ?? []).map((rowOrCol) => rowOrCol.split(''));
@@ -49,7 +46,7 @@ export class SudokuGenerator {
     return this.sudoku;
   }
 
-  static validate(puzzle: string): ValidationResult {
+  static validate(puzzle: string | string[][]): ValidationResult {
     let isOK = true;
     const errorsArray = Array(81).fill(false);
 
@@ -57,10 +54,17 @@ export class SudokuGenerator {
     const columns: Array<string[]> = Array.from({ length: 9 }, () => []);
     const boxes: Array<string[]> = Array.from({ length: 9 }, () => []);
 
+    const getCell = (i: number, j: number): string => {
+      if (typeof puzzle === 'string') {
+        return puzzle[i * 9 + j];
+      } else {
+        return puzzle[i][j];
+      }
+    };
+
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
-        const index = i * 9 + j;
-        const cell = puzzle[index];
+        const cell = getCell(i, j);
 
         if (cell === '-') {
           continue;
@@ -68,7 +72,7 @@ export class SudokuGenerator {
 
         if (rows[i].includes(cell)) {
           for (let k = 0; k < 9; k++) {
-            if (puzzle[i * 9 + k] === cell) {
+            if (getCell(i, k) === cell) {
               errorsArray[i * 9 + k] = true;
             }
           }
@@ -80,7 +84,7 @@ export class SudokuGenerator {
 
         if (columns[j].includes(cell)) {
           for (let k = 0; k < 9; k++) {
-            if (puzzle[k * 9 + j] === cell) {
+            if (getCell(k, j) === cell) {
               errorsArray[k * 9 + j] = true;
             }
           }
@@ -91,13 +95,15 @@ export class SudokuGenerator {
         }
 
         const boxIndex = Math.floor(i / 3) * 3 + Math.floor(j / 3);
+        const boxStartRow = Math.floor(i / 3) * 3;
+        const boxStartCol = Math.floor(j / 3) * 3;
 
         if (boxes[boxIndex].includes(cell)) {
           for (let bi = 0; bi < 3; bi++) {
             for (let bj = 0; bj < 3; bj++) {
-              const boxIndex = (Math.floor(i / 3) * 3 + bi) * 9 + (Math.floor(j / 3) * 3 + bj);
+              const boxIndex = (boxStartRow + bi) * 9 + (boxStartCol + bj);
 
-              if (puzzle[boxIndex] === cell) {
+              if (getCell(boxStartRow + bi, boxStartCol + bj) === cell) {
                 errorsArray[boxIndex] = true;
               }
             }
@@ -112,10 +118,12 @@ export class SudokuGenerator {
 
     const errors = errorsArray.map((hasError) => (hasError ? '+' : '-')).join('');
 
+    const isWin = isOK && (typeof puzzle === 'string' ? !puzzle.includes('-') : !puzzle.flat().includes('-'));
+
     return {
       errors,
       isOK,
-      isWin: isOK && !puzzle.includes('-'),
+      isWin,
     };
   }
 }
