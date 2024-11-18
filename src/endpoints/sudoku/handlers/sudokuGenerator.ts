@@ -6,9 +6,8 @@ export type Format = (typeof SudokuGenerator.FORMATS)[keyof typeof SudokuGenerat
 interface ValidationResult {
   isOK: boolean;
   isWin: boolean;
-  errors: string;
+  errors: string | string[][];
 }
-//TODO: передавать ошибки в виде массива
 
 export class SudokuGenerator {
   private sudoku: {
@@ -32,13 +31,15 @@ export class SudokuGenerator {
     return typeof argument === 'string' && Object.values<string>(SudokuGenerator.FORMATS).includes(argument);
   }
 
+  private static stringToMatrix(string: string) {
+    return (string.match(/.{9}/g) ?? []).map((rowOrCol) => rowOrCol.split(''));
+  }
+
   getResult(format: Format) {
     if (format === SudokuGenerator.FORMATS.MATRIX) {
-      const stringToMatrix = (string: string) => (string.match(/.{9}/g) ?? []).map((rowOrCol) => rowOrCol.split(''));
-
       return {
-        puzzle: stringToMatrix(this.sudoku.puzzle),
-        solution: stringToMatrix(this.sudoku.solution),
+        puzzle: SudokuGenerator.stringToMatrix(this.sudoku.puzzle),
+        solution: SudokuGenerator.stringToMatrix(this.sudoku.solution),
         difficulty: this.sudoku.difficulty,
       };
     }
@@ -46,7 +47,7 @@ export class SudokuGenerator {
     return this.sudoku;
   }
 
-  static validate(puzzle: string | string[][]): ValidationResult {
+  static validate(puzzle: string | string[][], format: Format): ValidationResult {
     let isOK = true;
     const errorsArray = Array(81).fill(false);
 
@@ -116,14 +117,15 @@ export class SudokuGenerator {
       }
     }
 
-    const errors = errorsArray.map((hasError) => (hasError ? '+' : '-')).join('');
-
     const isWin = isOK && (typeof puzzle === 'string' ? !puzzle.includes('-') : !puzzle.flat().includes('-'));
 
     return {
-      errors,
       isOK,
       isWin,
+      errors:
+        format === SudokuGenerator.FORMATS.MATRIX
+          ? SudokuGenerator.stringToMatrix(errorsArray.map((hasError) => (hasError ? '+' : '-')).join(''))
+          : errorsArray.map((hasError) => (hasError ? '+' : '-')).join(''),
     };
   }
 }
