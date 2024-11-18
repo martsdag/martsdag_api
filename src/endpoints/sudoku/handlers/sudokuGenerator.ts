@@ -3,10 +3,14 @@ import { getSudoku } from 'sudoku-gen';
 export type Difficulty = (typeof SudokuGenerator.DIFFICULTIES)[keyof typeof SudokuGenerator.DIFFICULTIES];
 export type Format = (typeof SudokuGenerator.FORMATS)[keyof typeof SudokuGenerator.FORMATS];
 
+type SudokuFieldAsString = string;
+type SudokuFieldAsMatrix = Array<Array<string>>;
+export type SudokuField = SudokuFieldAsString | SudokuFieldAsMatrix;
+
 interface ValidationResult {
   isOK: boolean;
   isWin: boolean;
-  errors: string | string[][];
+  errors: SudokuField;
 }
 
 export class SudokuGenerator {
@@ -36,32 +40,24 @@ export class SudokuGenerator {
   }
 
   getResult(format: Format) {
-    if (format === SudokuGenerator.FORMATS.MATRIX) {
-      return {
-        puzzle: SudokuGenerator.stringToMatrix(this.sudoku.puzzle),
-        solution: SudokuGenerator.stringToMatrix(this.sudoku.solution),
-        difficulty: this.sudoku.difficulty,
-      };
-    }
-
-    return this.sudoku;
+    return format === SudokuGenerator.FORMATS.MATRIX
+      ? {
+          puzzle: SudokuGenerator.stringToMatrix(this.sudoku.puzzle),
+          solution: SudokuGenerator.stringToMatrix(this.sudoku.solution),
+          difficulty: this.sudoku.difficulty,
+        }
+      : this.sudoku;
   }
 
-  static validate(puzzle: string | string[][], format: Format): ValidationResult {
+  static validate(puzzle: SudokuField, format: Format): ValidationResult {
     let isOK = true;
     const errorsArray = Array(81).fill(false);
 
-    const rows: Array<string[]> = Array.from({ length: 9 }, () => []);
-    const columns: Array<string[]> = Array.from({ length: 9 }, () => []);
-    const boxes: Array<string[]> = Array.from({ length: 9 }, () => []);
+    const rows: Array<Array<string>> = Array.from({ length: 9 }, () => []);
+    const columns: Array<Array<string>> = Array.from({ length: 9 }, () => []);
+    const boxes: Array<Array<string>> = Array.from({ length: 9 }, () => []);
 
-    const getCell = (i: number, j: number): string => {
-      if (typeof puzzle === 'string') {
-        return puzzle[i * 9 + j];
-      } else {
-        return puzzle[i][j];
-      }
-    };
+    const getCell = (i: number, j: number): string => (typeof puzzle === 'string' ? puzzle[i * 9 + j] : puzzle[i][j]);
 
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {

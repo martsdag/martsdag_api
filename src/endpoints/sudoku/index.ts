@@ -1,19 +1,19 @@
 import { Router } from 'express';
-import { Difficulty, Format, SudokuGenerator } from '@/endpoints/sudoku/handlers/sudokuGenerator';
+import { Difficulty, Format, SudokuField, SudokuGenerator } from '@/endpoints/sudoku/handlers/sudokuGenerator';
 
-import { query } from 'express-validator';
+import { query, matchedData } from 'express-validator';
 import { validationCheck } from '@/middleware/validationCheck';
 
 export const validateDifficultyQuery = //
   query('difficulty')
     .optional()
-    .isIn(['easy', 'medium', 'hard', 'expert'])
+    .custom(SudokuGenerator.isValidDifficulty)
     .withMessage('Invalid difficulty. Must be one of: easy, medium, hard, expert');
 
 export const validateFormatQuery = //
   query('format') //
     .optional()
-    .isIn(['string', 'matrix'])
+    .custom(SudokuGenerator.isValidFormat)
     .withMessage('Invalid format. Must be one of: string, matrix');
 
 export const validatePuzzleQuery = //
@@ -55,21 +55,25 @@ export const validatePuzzleQuery = //
 const router = Router();
 
 router.get('/', validateDifficultyQuery, validateFormatQuery, validationCheck, (req, res) => {
-  const maybeDifficulty = req.query.difficulty as Difficulty;
-  const maybeFormat = req.query.format as Format;
+  const { difficulty, format } = matchedData<{
+    difficulty?: Difficulty;
+    format?: Format;
+  }>(req, { locations: ['query'] });
 
   res.send(
-    new SudokuGenerator(maybeDifficulty ?? SudokuGenerator.DIFFICULTIES.EASY).getResult(
-      maybeFormat ?? SudokuGenerator.FORMATS.STRING,
+    new SudokuGenerator(difficulty ?? SudokuGenerator.DIFFICULTIES.EASY).getResult(
+      format ?? SudokuGenerator.FORMATS.STRING,
     ),
   );
 });
 
-router.get('/validate', validatePuzzleQuery, validationCheck, (req, res) => {
-  const maybePuzzle = req.query.puzzle as string | string[][];
-  const maybeFormat = req.query.format as Format;
+router.get('/validate', validatePuzzleQuery, validateFormatQuery, validationCheck, (req, res) => {
+  const { puzzle, format } = matchedData<{
+    puzzle: SudokuField;
+    format?: Format;
+  }>(req, { locations: ['query'] });
 
-  res.send(SudokuGenerator.validate(maybePuzzle, maybeFormat));
+  res.send(SudokuGenerator.validate(puzzle, format ?? SudokuGenerator.FORMATS.STRING));
 });
 
 export { router as sudoku };
